@@ -1,0 +1,1126 @@
+@reference "../../styles.css";
+
+/* ============================================================
+ * Intelligence Membrane — stage, providers, panel
+ * Uses modern CSS: nesting, container queries, :has(), color-mix,
+ * clamp(), logical properties.
+ *
+ * :has() is used on .stage to deepen the membrane glow when a provider
+ * node is selected — purely CSS, no JS involvement.
+ * ========================================================== */
+
+/* Legacy .section kept for backwards compat; new layout uses .storySection */
+.section {
+  position: relative;
+  inline-size: 100%;
+  min-block-size: 100dvh;
+  padding-block-start: clamp(0.5rem, 1.2vw, 0.85rem);
+  padding-block-end: clamp(1rem, 2vw, 1.5rem);
+  padding-inline: clamp(1rem, 4vw, 3rem);
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--mem-accent) 14%, transparent), transparent 60%),
+    var(--mem-bg);
+  color: var(--mem-text);
+  overflow: clip;
+  isolation: isolate;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--mem-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--mem-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 50% 45%, #000 30%, transparent 75%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* ── Main section container ───────────────────────────────────────────────── */
+.storySection {
+  position: relative;
+  inline-size: 100%;
+  padding-inline: clamp(1rem, 4vw, 3rem);
+  padding-block-start: clamp(1rem, 2vw, 1.75rem);
+  padding-block-end: clamp(2rem, 4vw, 4rem);
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in oklab, var(--mem-accent) 14%, transparent), transparent 60%),
+    var(--mem-bg);
+  color: var(--mem-text);
+  overflow: clip;
+  isolation: isolate;
+
+  /* Grid lines background */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, var(--mem-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--mem-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 50% 40%, #000 28%, transparent 72%);
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* ── Stage divider — visual narrative breadcrumb ──────────────────────────── */
+.stageDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-inline-size: 1100px;
+  margin-inline: auto;
+  margin-block: clamp(0.75rem, 1.5vw, 1.25rem) clamp(0.5rem, 1vw, 0.75rem);
+  position: relative;
+  z-index: 2;
+}
+
+.stageDividerIcon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.stageDividerLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mem-text-subtle);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.stageDividerLine {
+  flex: 1;
+  block-size: 1px;
+  background: linear-gradient(to right, var(--mem-border), transparent);
+}
+
+/* ── Membrane + Detail Panel side-by-side row ──────────────────────────────── */
+.membraneStageRow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-inline-size: 1200px;
+  margin-inline: auto;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .membraneStageRow {
+    /* Give membrane more room — 55% / 45% */
+    grid-template-columns: 1.25fr 1fr;
+    align-items: center;
+    gap: 2.5rem;
+  }
+}
+
+/* ── Detail panel column (right of stage on desktop) ─────────────────────── */
+.detailPanelCol {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 320px;
+}
+
+/* ── Analysis reveal — emerges FROM LEFT ────────────────────────────────── */
+.analysisReveal {
+  position: relative;
+  z-index: 1;
+  inline-size: 100%;
+  will-change: transform, opacity, filter;
+}
+
+/* ── Forecast reveal — emerges FROM RIGHT ───────────────────────────────── */
+.forecastReveal {
+  position: relative;
+  z-index: 1;
+  inline-size: 100%;
+  will-change: transform, opacity, filter;
+}
+
+/* ── Side-by-side layout for analysis + forecast ───────────────────────── */
+.insightsForecastRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-inline-size: 1200px;
+  margin-inline: auto;
+  margin-block-start: 0.5rem;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 900px) {
+  .insightsForecastRow {
+    grid-template-columns: 1.35fr 1fr; /* ~57/43 split */
+    gap: 2rem;
+  }
+}
+
+.header {
+  position: relative;
+  z-index: 2;
+  max-inline-size: 64rem;
+  margin-inline: auto;
+  text-align: center;
+  margin-block-end: 0.25rem;
+
+  & h2 {
+    font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    margin-block: 0.25rem 0.35rem;
+    background: linear-gradient(180deg, var(--mem-text), color-mix(in oklab, var(--mem-text) 60%, transparent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  & p {
+    font-size: clamp(0.82rem, 1vw, 0.9rem);
+    color: var(--mem-text-muted);
+    max-inline-size: 38rem;
+    margin-inline: auto;
+    line-height: 1.4;
+  }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mem-text-muted);
+  background: color-mix(in oklab, var(--mem-surface) 70%, transparent);
+  border: 1px solid var(--mem-border);
+  backdrop-filter: blur(8px);
+
+  & span:first-child {
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: 999px;
+    background: var(--mem-success);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--mem-success) 25%, transparent);
+    animation: ping 2s ease-out infinite;
+  }
+}
+
+@keyframes ping {
+  0%, 60%, 100% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--mem-success) 25%, transparent); }
+  30% { box-shadow: 0 0 0 9px color-mix(in oklab, var(--mem-success) 0%, transparent); }
+}
+
+/* ------ Dashboard Grid (legacy, kept for safety) ------ */
+.dashboardGrid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-inline-size: 1400px;
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  .dashboardGrid {
+    grid-template-columns: 1.25fr 0.75fr;
+    grid-template-rows: auto auto;
+    align-items: stretch;
+  }
+}
+
+.metricsCol,
+.analysisCol,
+.forecastCol {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Stage — the constellation visualization */
+.stage {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  inline-size: 100%;
+  max-inline-size: 380px;
+  margin-inline: auto;
+  container-type: inline-size;
+
+  /* :has() — deepen center glow when any provider node is selected (pure CSS) */
+  &:has([data-active="true"]) {
+    filter: drop-shadow(0 0 32px color-mix(in oklab, var(--mem-accent) 20%, transparent));
+  }
+}
+
+@media (min-width: 900px) {
+  .stage {
+    max-inline-size: 410px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .stage {
+    max-inline-size: 440px;
+  }
+}
+
+.stageSvg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Provider node card, positioned absolutely on the stage */
+.providerNode {
+  position: absolute;
+  translate: -50% -50%;
+  inline-size: clamp(8.5rem, 18cqw, 12rem);
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--mem-bg-elevated) 92%, transparent);
+  border: 1px solid var(--mem-border);
+  backdrop-filter: blur(12px);
+  cursor: pointer;
+  text-align: start;
+  color: var(--mem-text);
+  font: inherit;
+  transition: border-color 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow:
+    0 1px 0 color-mix(in oklab, white 30%, transparent) inset,
+    0 4px 14px color-mix(in oklab, var(--mem-text) 10%, transparent);
+
+  &:focus-visible {
+    outline: 2px solid var(--mem-accent);
+    outline-offset: 4px;
+  }
+
+  &[data-active="true"] {
+    border-color: color-mix(in oklab, var(--prov-color) 65%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--prov-color) 50%, transparent),
+      0 12px 40px color-mix(in oklab, var(--prov-color) 30%, transparent);
+  }
+
+  &[data-dim="true"] {
+    opacity: 0.45;
+    filter: saturate(0.7);
+  }
+
+  & :global(.provHead) {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-block-end: 0.4rem;
+  }
+
+  & :global(.provDot) {
+    inline-size: 9px;
+    block-size: 9px;
+    border-radius: 999px;
+    background: var(--prov-color);
+    box-shadow: 0 0 12px var(--prov-color);
+  }
+
+  & :global(.provName) {
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  & :global(.provTag) {
+    font-size: 0.7rem;
+    color: var(--mem-text-subtle);
+    line-height: 1.3;
+  }
+
+  & :global(.provStat) {
+    margin-block-start: 0.55rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+  }
+  & :global(.provStatNum) {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--prov-color);
+  }
+  & :global(.provStatLabel) {
+    font-size: 0.65rem;
+    color: var(--mem-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+/* Membrane orb */
+.membrane {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: 58%;
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 45%, white) 0%, transparent 45%),
+    radial-gradient(circle at 70% 75%, color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 65%, transparent) 0%, transparent 55%),
+    radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 35%, transparent), color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 10%, transparent) 70%);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 30%, transparent),
+    0 0 80px color-mix(in oklab, var(--membrane-glow, var(--mem-accent)) 30%, transparent),
+    inset 0 0 60px color-mix(in oklab, white 14%, transparent);
+  pointer-events: none;
+  transition: background 0.8s ease, box-shadow 0.8s ease, border-color 0.8s ease;
+}
+
+.membraneInner {
+  position: relative;
+  inline-size: 78%;
+  aspect-ratio: 1 / 1;
+  border-radius: 999px;
+  background: radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--mem-bg-elevated) 45%, transparent), color-mix(in oklab, var(--mem-bg-elevated) 15%, transparent));
+  border: 1px solid color-mix(in oklab, white 15%, transparent);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1rem;
+  backdrop-filter: blur(12px);
+  overflow: visible;
+}
+
+.membraneLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--mem-text) 50%, transparent);
+  margin-block-end: 0.35rem;
+}
+.membraneValue {
+  font-size: clamp(1.4rem, 4cqw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--mem-text);
+  line-height: 1;
+}
+.membraneSub {
+  margin-block-start: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--mem-text-muted);
+}
+
+/* Concentric rings */
+.ring {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in oklab, var(--mem-text) 12%, transparent);
+  pointer-events: none;
+}
+
+/* ------ Detail panel ------ */
+.panel {
+  position: relative;
+  background: var(--mem-bg-elevated);
+  border: 1px solid var(--mem-border);
+  border-radius: 20px;
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--mem-text) 5%, transparent), 0 18px 40px -16px color-mix(in oklab, var(--mem-text) 18%, transparent);
+  overflow: clip;
+  container-type: inline-size;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(90deg, transparent, var(--panel-accent, var(--mem-accent)), transparent);
+  }
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-block-end: 1.25rem;
+
+  & h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+}
+
+.panelDot {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 999px;
+  background: var(--panel-accent, var(--mem-accent));
+  box-shadow: 0 0 14px var(--panel-accent, var(--mem-accent));
+}
+
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+@container (min-width: 380px) {
+  .metricGrid { grid-template-columns: 1fr 1fr; }
+}
+
+.metric {
+  position: relative;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: var(--mem-surface);
+  border: 1px solid var(--mem-border);
+  overflow: clip;
+
+  & :global(.metricLabel) {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--mem-text-subtle);
+  }
+  & :global(.metricValue) {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    margin-block-start: 0.2rem;
+  }
+  & :global(.metricBar) {
+    position: relative;
+    margin-block-start: 0.7rem;
+    block-size: 4px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--mem-text) 8%, transparent);
+    overflow: hidden;
+  }
+  & :global(.metricBarFill) {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--panel-accent, var(--mem-accent)), color-mix(in oklab, var(--panel-accent, var(--mem-accent)) 60%, transparent));
+  }
+}
+
+.summary {
+  margin-block-start: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.summaryCard {
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--mem-border);
+  background: color-mix(in oklab, var(--panel-accent, var(--mem-accent)) 6%, var(--mem-surface));
+
+  & :global(.summaryLabel) {
+    font-size: 0.7rem;
+    color: var(--mem-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+  & :global(.summaryValue) {
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-block-start: 0.25rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--mem-text);
+  }
+  & :global(.summaryHint) {
+    font-size: 0.72rem;
+    color: var(--mem-text-muted);
+    margin-block-start: 0.25rem;
+  }
+}
+
+/* ------ Badge ------ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  background: var(--mem-surface);
+  border: 1px solid var(--mem-border);
+  color: var(--mem-text-muted);
+
+  &[data-tone="success"] {
+    color: var(--mem-success);
+    background: color-mix(in oklab, var(--mem-success) 12%, transparent);
+    border-color: color-mix(in oklab, var(--mem-success) 30%, transparent);
+  }
+  &[data-tone="accent"] {
+    color: var(--mem-accent);
+    background: color-mix(in oklab, var(--mem-accent) 12%, transparent);
+    border-color: color-mix(in oklab, var(--mem-accent) 30%, transparent);
+  }
+}
+.badgeDot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+/* ------ Status / empty / error ------ */
+.status {
+  display: grid;
+  place-items: center;
+  padding: 3rem;
+  color: var(--mem-text-muted);
+  text-align: center;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--mem-surface), color-mix(in oklab, var(--mem-surface) 60%, white), var(--mem-surface));
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Toolbar */
+.toolbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-block-end: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--mem-border);
+  background: color-mix(in oklab, var(--mem-bg-elevated) 70%, transparent);
+  color: var(--mem-text-muted);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 220ms ease;
+
+  &:hover { color: var(--mem-text); border-color: color-mix(in oklab, var(--mem-text) 30%, transparent); }
+  &:focus-visible { outline: 2px solid var(--mem-accent); outline-offset: 2px; }
+  &[data-active="true"] {
+    color: var(--mem-bg);
+    background: var(--mem-text);
+    border-color: var(--mem-text);
+  }
+}
+
+.themeToggle {
+  position: fixed;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+  z-index: 10;
+  inline-size: 38px;
+  block-size: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--mem-border);
+  background: var(--mem-bg-elevated);
+  color: var(--mem-text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  &:focus-visible { outline: 2px solid var(--mem-accent); outline-offset: 2px; }
+}
+
+/* ================================================================
+ * Insight color tokens (scoped here, not global, to avoid leakage)
+ * ============================================================== */
+:root,
+.section {
+  --ins-critical:     oklch(0.62 0.22 25);
+  --ins-warning:      oklch(0.72 0.18 75);
+  --ins-opportunity:  oklch(0.70 0.19 155);
+  --ins-info:         oklch(0.65 0.14 250);
+}
+
+/* ================================================================
+ * OPTIMIZATION INTELLIGENCE LAYER — InsightsFeed
+ * ============================================================== */
+.insightsFeed {
+  position: relative;
+  background: color-mix(in oklab, var(--mem-bg-elevated) 96%, transparent);
+  border: 1px solid var(--mem-border);
+  border-radius: 20px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow: clip;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+  /* Subtle top accent rule */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--feed-accent, var(--mem-accent)),
+      transparent
+    );
+  }
+}
+
+.insightsHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-block-end: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.insightsPulse {
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 999px;
+  background: var(--feed-accent, var(--mem-accent));
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--feed-accent, var(--mem-accent)) 22%, transparent);
+  flex-shrink: 0;
+  animation: insightPing 2.4s ease-out infinite;
+}
+@keyframes insightPing {
+  0%, 70%, 100% { box-shadow: 0 0 0 4px color-mix(in oklab, var(--feed-accent, var(--mem-accent)) 22%, transparent); }
+  35%            { box-shadow: 0 0 0 9px color-mix(in oklab, var(--feed-accent, var(--mem-accent)) 0%, transparent); }
+}
+
+.insightsTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--mem-text);
+  flex: 1;
+}
+
+.insightsBadge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--feed-accent, var(--mem-accent)) 35%, transparent);
+  background: color-mix(in oklab, var(--feed-accent, var(--mem-accent)) 10%, transparent);
+  color: var(--feed-accent, var(--mem-accent));
+  letter-spacing: 0.04em;
+}
+
+/* --- Cycling ticker --- */
+.insightsTicker {
+  position: relative;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  background: var(--mem-surface);
+  border: 1px solid var(--mem-border);
+  margin-block-end: 1rem;
+  min-block-size: 3.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow: clip;
+}
+
+.insightsTick {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.insightsTickDot {
+  inline-size: 7px;
+  block-size: 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.insightsTickText {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--mem-text);
+  flex: 1;
+  line-height: 1.3;
+}
+
+.insightsTickImpact {
+  font-size: 0.76rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.insightsTickDots {
+  display: flex;
+  gap: 5px;
+  align-self: flex-end;
+}
+
+.insightsDotBtn {
+  inline-size: 16px;
+  block-size: 4px;
+  border-radius: 999px;
+  border: none;
+  padding: 0;
+  background: color-mix(in oklab, var(--mem-text) 15%, transparent);
+  cursor: pointer;
+  transition: background 220ms, width 220ms;
+
+  &[data-active="true"] {
+    inline-size: 24px;
+    background: var(--feed-accent, var(--mem-accent));
+  }
+}
+
+/* --- Full insight list --- */
+.insightsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+@media (min-width: 1024px) {
+  .insightsList {
+    max-block-size: 165px;
+    overflow-y: auto;
+    padding-inline-end: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklab, var(--mem-text) 15%, transparent) transparent;
+  }
+  .insightsList::-webkit-scrollbar {
+    width: 4px;
+  }
+  .insightsList::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .insightsList::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--mem-text) 15%, transparent);
+    border-radius: 99px;
+  }
+}
+
+.insightRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  background: var(--mem-surface);
+  border: 1px solid var(--mem-border);
+  border-inline-start: 3px solid var(--ins-row-color, var(--mem-accent));
+  cursor: default;
+  transition: background 200ms;
+
+  &:hover { background: color-mix(in oklab, var(--mem-surface) 70%, var(--mem-bg-elevated)); }
+}
+
+.insightRowLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.insightRowIcon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+.insightRowContent {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.insightRowTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--mem-text);
+  line-height: 1.3;
+  margin-block-end: 0.2rem;
+}
+
+.insightRowDetail {
+  font-size: 0.72rem;
+  color: var(--mem-text-muted);
+  line-height: 1.4;
+  margin-block-end: 0.45rem;
+}
+
+.insightRowBar {
+  block-size: 3px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--mem-text) 8%, transparent);
+  overflow: hidden;
+  position: relative;
+}
+
+.insightRowBarFill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: 999px;
+}
+
+.insightRowRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.insightSeverityChip {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.insightImpactLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--mem-text-muted);
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+/* ================================================================
+ * PREDICTION MODE — ForecastCard
+ * ============================================================== */
+.forecastCard {
+  position: relative;
+  background: var(--mem-bg-elevated);
+  border: 1px solid var(--mem-border);
+  border-radius: 20px;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  overflow: clip;
+  container-type: inline-size;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--forecast-accent, var(--mem-accent)) 30%,
+      color-mix(in oklab, var(--forecast-accent, var(--mem-accent)) 50%, transparent) 70%,
+      transparent
+    );
+  }
+}
+
+.forecastHeader {
+  margin-block-end: 0.9rem;
+}
+
+.forecastTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-block-end: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.forecastLiveBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--forecast-accent, var(--mem-accent)) 40%, transparent);
+  background: color-mix(in oklab, var(--forecast-accent, var(--mem-accent)) 12%, transparent);
+  color: var(--forecast-accent, var(--mem-accent));
+}
+
+.forecastLiveDot {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: insightPing 2s ease-out infinite;
+}
+
+.forecastProviderName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--mem-text);
+  letter-spacing: -0.01em;
+}
+
+.forecastSubtitle {
+  font-size: 0.72rem;
+  color: var(--mem-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Semi-circular utilization arc */
+.forecastArcWrap {
+  margin-block: 0.75rem;
+  display: flex;
+  justify-content: center;
+}
+
+.forecastArc {
+  inline-size: clamp(90px, 20cqw, 130px);
+}
+
+/* Forecast metric rows */
+.forecastRows {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+@container (min-width: 300px) {
+  .forecastRows { grid-template-columns: 1fr 1fr; }
+}
+
+.forecastRow {
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  background: var(--mem-surface);
+  border: 1px solid var(--mem-border);
+  transition: border-color 300ms ease;
+
+  &[data-highlight="true"] {
+    background: color-mix(in oklab, var(--forecast-accent, var(--mem-accent)) 7%, var(--mem-surface));
+  }
+}
+
+.forecastRowLabel {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mem-text-subtle);
+  margin-block-end: 0.2rem;
+}
+
+.forecastRowValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  color: var(--mem-text);
+  line-height: 1.15;
+  margin-block-end: 0.15rem;
+}
+
+.forecastRowHint {
+  font-size: 0.68rem;
+  color: var(--mem-text-muted);
+  line-height: 1.3;
+}
+
+/* ================================================================
+ * ACCESSIBILITY — prefers-reduced-motion
+ * When the user prefers reduced motion: strip all transforms and
+ * blur, keeping only opacity transitions (simple fades).
+ * ============================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .stageDivider,
+  .analysisReveal,
+  .forecastReveal,
+  .membrane,
+  .membraneInner {
+    transition: opacity 0.3s ease !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .insightRowBarFill {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ================================================================
+ * RESPONSIVE — Tablet & Mobile
+ * Story sections remain single-column and readable.
+ * ============================================================== */
+@media (max-width: 640px) {
+  .stageDivider {
+    margin-block: 1.5rem 1rem;
+  }
+  .membraneStageRow {
+    gap: 1rem;
+  }
+  .detailPanelCol {
+    min-block-size: unset;
+  }
+  .storySection {
+    padding-inline: 1rem;
+  }
+}
+
+.stageGroupWrapper {
+  max-inline-size: 1400px;
+  inline-size: 100%;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
